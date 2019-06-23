@@ -1,0 +1,23 @@
+
+version: '3'
+services:
+  mysql:
+    image: mysql:5.7.15
+    ports:
+      - 3309:3306
+    command: "mysqld"
+    environment:
+      - MYSQL_ROOT_PASSWORD=5Mr3XUmE
+  node :
+    build: .
+    depends_on:
+      - mysql
+    environment:
+      - db=db
+      - host=mysql
+      - user=root
+      - password=5Mr3XUmE
+    volumes:
+      - ./classes:/usr/app/classes
+    ports:
+      - 8080:8080
