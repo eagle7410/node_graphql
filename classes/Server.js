@@ -27,6 +27,12 @@ class Server extends ServerFrame{
 		this._app.use('/graphql', graphqlHTTP({
 			schema,
 			graphiql: true,
+			context: {
+				user: {
+					name : 'TEST',
+					surname : 'Anonymous'
+				},
+			}
 		}));
 
 		await super.up();

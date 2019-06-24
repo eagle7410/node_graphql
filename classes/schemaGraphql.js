@@ -7,6 +7,8 @@ const {
 } = require('graphql');
 
 const Model = require('./Model');
+const ModelUsers = require('./ModelUsers');
+
 const {
 	TableUsers,
 	TableProfile
@@ -47,6 +49,7 @@ const typeUser = new GraphQLObjectType({
 			description : "User profile",
 			type : typeProfile,
 			async resolve (parent) {
+
 				return await Model._queryOne(
 					`SELECT * FROM ${TableProfile} WHERE id = ?`,
 					[parent.id]
@@ -73,9 +76,7 @@ const schema = new GraphQLSchema({
 				description : "Get users list",
 				type: GraphQLList(typeUser),
 				async resolve() {
-					return await Model._query(
-						`SELECT * FROM ${TableUsers}`,
-					);
+					return await ModelUsers.all();
 				}
 			},
 			user : {
@@ -87,10 +88,7 @@ const schema = new GraphQLSchema({
 					}
 				},
 				async resolve(p, {id}) {
-					return await Model._queryOne(
-						`SELECT * FROM ${TableUsers} WHERE id = ?`,
-						[id]
-					);
+					return await ModelUsers.findById(id);
 				}
 			},
 		}
