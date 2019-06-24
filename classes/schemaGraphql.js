@@ -17,9 +17,11 @@ const typeProfile = new GraphQLObjectType({
 	description : "User profile",
 	fields: {
 		name_first: {
+			description : "Name user",
 			type : GraphQLString,
 		},
 		name_last : {
+			description : "Surname user",
 			type : GraphQLString,
 		},
 	}
@@ -30,15 +32,19 @@ const typeUser = new GraphQLObjectType({
 	description : "User",
 	fields: {
 		id: {
+			description : "User id",
 			type : GraphQLInt
 		},
 		login: {
+			description : "User login",
 			type : GraphQLString,
 		},
 		pass : {
+			description : "User password",
 			type : GraphQLString,
 		},
 		profile : {
+			description : "User profile",
 			type : typeProfile,
 			async resolve (parent) {
 				return await Model._queryOne(
