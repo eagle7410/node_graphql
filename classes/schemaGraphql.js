@@ -48,12 +48,8 @@ const typeUser = new GraphQLObjectType({
 		profile : {
 			description : "User profile",
 			type : typeProfile,
-			async resolve (parent) {
-
-				return await Model._queryOne(
-					`SELECT * FROM ${TableProfile} WHERE id = ?`,
-					[parent.id]
-				);
+			async resolve (parent, agrs, {dataloaders:{ProfileLoader}}) {
+				return await ProfileLoader.load(parent.id);
 			}
 		}
 	}
@@ -87,8 +83,8 @@ const schema = new GraphQLSchema({
 						type : GraphQLInt,
 					}
 				},
-				async resolve(p, {id}) {
-					return await ModelUsers.findById(id);
+				async resolve(p, agrs, {dataloaders:{ProfileLoader}}, info) {
+					return await ModelUsers.findById(agrs.id);
 				}
 			},
 		}

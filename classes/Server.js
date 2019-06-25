@@ -2,6 +2,8 @@ const db = require('./db');
 const graphqlHTTP = require('express-graphql');
 const bodyParser = require('body-parser');
 const ServerFrame = require('./ServerFrame');
+const dataloaders = require('./dataloaders');
+
 const {
 	TableProfile,
 	TableUsers,
@@ -28,6 +30,7 @@ class Server extends ServerFrame{
 			schema,
 			graphiql: true,
 			context: {
+				dataloaders,
 				user: {
 					name : 'TEST',
 					surname : 'Anonymous'
