@@ -21,41 +21,6 @@ class Model {
 		return db.config.connectionConfig.database;
 	}
 
-	static validator () {
-		return ModelValidate;
-	}
-	static jsonParse(string, messageErrorAlias) {
-		return this.validator()._jsonParse(string, messageErrorAlias);
-	}
-
-	static validate (modelMethod, config) {
-
-		let methods = Object.keys(config);
-
-		if (methods.includes('isExists')) {
-			methods = methods.filter(method => method !== 'isExists');
-			methods.unshift('isExists');
-		}
-
-		let vals;
-
-		for (let method  of methods) {
-			vals = config[method];
-
-			if (typeof ModelValidate[method] !== 'function') {
-				throw new Error(`[Model ${this.name}|${modelMethod}|validate]. Bad validator ${method}`);
-			}
-
-			if (!Array.isArray(vals))
-				vals = [vals];
-
-			for (let val of vals) this._validateMethod(method, val);
-		}
-	}
-
-	static _validateMethod(method, val) {
-		ModelValidate[method](val);
-	}
 	/**
 	 * Build query string. May be use for debug.
 	 *
@@ -71,39 +36,6 @@ class Model {
 
 	static getTableName () {
 		throw new ErrorDatabase(`No implement method getTableName in ${this.name}`);
-	}
-
-	static async save(data, escape = true) {
-
-		let result = await this._query(
-			`INSERT IGNORE INTO ${this.getTableName()} SET ?`,
-			this.buildTableObject(data, escape)
-		);
-
-		data.id = result.insertId;
-
-		return data;
-	}
-
-	static buildTableObject(data, escape = true, strict = false) {
-
-		const table = this.getTableName ();
-
-		if (!structure[table])
-			throw new ErrorDatabase('Unknown table! ' + table);
-
-		const modelData = {};
-
-		for (const key of structure[table].columns) {
-			const value = data[key];
-
-			if (value)
-				modelData[key] = escape ? this.escape(value) : value;
-			else if (strict)
-				return;
-		}
-
-		return modelData;
 	}
 
 	/**

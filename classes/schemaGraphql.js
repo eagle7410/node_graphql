@@ -3,16 +3,18 @@ const {
 	GraphQLObjectType,
 	GraphQLList,
 	GraphQLString,
-	GraphQLInt
+	GraphQLInt,
+	GraphQLNonNull,
 } = require('graphql');
 
-const Model = require('./Model');
 const ModelUsers = require('./ModelUsers');
+const ModelProfile = require('./ModelProfile');
 
-const {
-	TableUsers,
-	TableProfile
-} = require('./tables');
+const Str = GraphQLNonNull(GraphQLString);
+const StrNull = GraphQLString;
+const Int = GraphQLNonNull(GraphQLInt);
+const IntNull = GraphQLInt;
+const List = GraphQLList;
 
 const typeProfile = new GraphQLObjectType({
 	name : 'profile',
@@ -20,11 +22,15 @@ const typeProfile = new GraphQLObjectType({
 	fields: {
 		name_first: {
 			description : "Name user",
-			type : GraphQLString,
+			type : StrNull,
 		},
 		name_last : {
 			description : "Surname user",
-			type : GraphQLString,
+			type : StrNull,
+		},
+		phone : {
+			description : "Surname user",
+			type : StrNull,
 		},
 	}
 });
@@ -35,15 +41,15 @@ const typeUser = new GraphQLObjectType({
 	fields: {
 		id: {
 			description : "User id",
-			type : GraphQLInt
+			type : Int
 		},
 		login: {
 			description : "User login",
-			type : GraphQLString,
+			type : Str
 		},
 		pass : {
 			description : "User password",
-			type : GraphQLString,
+			type : GraphQLNonNull(GraphQLString),
 		},
 		profile : {
 			description : "User profile",
@@ -63,14 +69,14 @@ const schema = new GraphQLSchema({
 		fields: {
 			hello: {
 				description : "hello word test url",
-				type: GraphQLString,
+				type: Str,
 				resolve(p, {id}) {
 					return 'world';
 				}
 			},
 			users : {
 				description : "Get users list",
-				type: GraphQLList(typeUser),
+				type: List(typeUser),
 				async resolve() {
 					return await ModelUsers.all();
 				}
@@ -80,7 +86,7 @@ const schema = new GraphQLSchema({
 				type: typeUser,
 				args: {
 					id : {
-						type : GraphQLInt,
+						type : Int,
 					}
 				},
 				async resolve(p, agrs, {dataloaders:{ProfileLoader}}, info) {
@@ -88,6 +94,39 @@ const schema = new GraphQLSchema({
 				}
 			},
 		}
+	}),
+	mutation : new GraphQLObjectType({
+		name: 'Mutation',
+		description : "Changes",
+		fields : {
+			profileUpdateById : {
+				description : "Update user by id",
+				type: typeProfile,
+				args: {
+					id : {
+						type : Int,
+					},
+					name : {
+						type : Str
+					},
+					lastname : {
+						type : Str
+					}
+
+				},
+				async resolve(p, {id, name, lastname}, {dataloaders:{ProfileLoader}}, info) {
+					ProfileLoader.clear(id);
+
+					await ModelProfile.updateById(id, {
+						name_first: name,
+						name_last : lastname
+					});
+
+					return ProfileLoader.load(id)
+				}
+			},
+		}
+
 	})
 });
 

@@ -82,6 +82,7 @@ class Server extends ServerFrame{
 			'  `id` int(11) NOT NULL auto_increment,' +
 			'  `name_first` varchar(50) NOT NULL ,' +
 			'  `name_last`  varchar(50) NOT NULL ,' +
+			'  `phone`  varchar(50) DEFAULT NULL ,' +
 			'   PRIMARY KEY  (`id`)' +
 			');'
 		);
@@ -97,8 +98,8 @@ class Server extends ServerFrame{
 
 		if (await Model.count(null, {}, TableProfile) < 1) {
 			await Model._query(
-				'INSERT INTO ' + TableProfile + '(id, name_first, name_last) ' +
-				" VALUES (1, 'n1', 's1'), (2, 'n2', 's2')"
+				'INSERT INTO ' + TableProfile + '(id, name_first, name_last, phone) ' +
+				" VALUES (1, 'n1', 's1', '25-25-25'), (2, 'n2', 's2', null)"
 			);
 		}
 
